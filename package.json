@@ -1,0 +1,20 @@
+{
+  "name": "floema",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run development",
+    "build": "webpack -p --progress --config webpack.config.build.js",
+    "development": "webpack-dev-server --progress --config webpack.config.development.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ambivce Bizarro",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "webpack-merge": "^5.10.0"
+  }
+}
