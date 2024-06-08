@@ -4,6 +4,9 @@ const path = require("path");
 // plugins
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 // variables
 const IS_DEVELOPMENT = process.env.NODE_ENV === "dev";
@@ -40,6 +43,23 @@ module.exports = {
       filename: "[name].css",
       chunkFilename: "[id].css",
     }),
+
+    new ImageMinimizerPlugin({
+      minimizer: {
+        implementation: ImageMinimizerPlugin.imageminMinify,
+        options: {
+          // Lossless optimization with custom option
+          // Feel free to experiment with options for better result for you
+          plugins: [
+            ["gifsicle", { interlaced: true }],
+            ["jpegtran", { progressive: true }],
+            ["optipng", { optimizationLevel: 5 }],
+          ],
+        },
+      },
+    }),
+
+    new CleanWebpackPlugin(),
   ],
 
   module: {
@@ -76,10 +96,35 @@ module.exports = {
         loader: "file-loader",
         options: {
           name: function (file) {
-            return "[name].[ext]";
+            return "[hash].[ext]";
           },
         },
       },
+
+      {
+        test: /\.(jpe?g|png|gif|svg|webp)$/i,
+        use: [
+          {
+            loader: ImageMinimizerPlugin.loader,
+          },
+        ],
+      },
+
+      {
+        test: /\.(glsl|frag|vert)$/,
+        loader: "raw-loader",
+        exclude: /node_modules/,
+      },
+
+      {
+        test: /\.(glsl|frag|vert)$/,
+        loader: "glslify-loader",
+        exclude: /node_modules/,
+      },
     ],
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin()],
   },
 };
